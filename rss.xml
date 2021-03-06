@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+
+
+
+
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>瞌睡虫狂鼠</title>
+        <link>https://kuangshu.github.io/</link>
+        <description>MemE is a powerful and highly customizable GoHugo theme for personal blogs.</description>
+        <generator>Hugo 0.78.2 https://gohugo.io/</generator>
+        
+            <language>en</language>
+        
+        
+            <managingEditor>252019869@qq.com (kuangshu)</managingEditor>
+        
+        
+            <webMaster>252019869@qq.com (kuangshu)</webMaster>
+        
+        
+            <copyright>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en)</copyright>
+        
+        <lastBuildDate>Sat, 06 Mar 2021 18:56:17 &#43;0800</lastBuildDate>
+        
+            <atom:link rel="self" type="application/rss&#43;xml" href="https://kuangshu.github.io/rss.xml" />
+        
+        
+    </channel>
+</rss>
