@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="zh-CN"><title type="text">瞌睡虫狂鼠</title><subtitle type="html">MemE 是一个强大且可高度定制的 GoHugo 博客主题，专为个人博客设计。</subtitle><updated>2021-07-21T18:06:05+08:00</updated><id>https://kuangshu.github.io/</id><link rel="alternate" type="text/html" href="https://kuangshu.github.io/"/><link rel="self" type="application/atom+xml" href="https://kuangshu.github.io/atom.xml"/><author><name>kuangshu</name><uri>https://kuangshu.github.io/</uri><email>252019869@qq.com</email></author><rights>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</rights><generator uri="https://gohugo.io/" version="0.85.0">Hugo</generator><entry><title type="text">项目Git分支管理</title><link rel="alternate" type="text/html" href="https://kuangshu.github.io/posts/git-branch/"/><id>https://kuangshu.github.io/posts/git-branch/</id><updated>2021-07-21T18:06:04+08:00</updated><published>2021-05-02T11:02:20+08:00</published><author><name>kuangshu</name><uri>https://kuangshu.github.io/</uri><email>252019869@qq.com</email></author><rights>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</rights><summary type="html">前言 日常迭代的项目中，由于有多人开发所以分支及合并经常会非常混乱，如果不加以规范和约……</summary><content type="html">&lt;h2 id="前言">前言&lt;/h2>
+&lt;p>日常迭代的项目中，由于有多人开发所以分支及合并经常会非常混乱，如果不加以规范和约束，那么长久迭代之后肯定会非常混乱。由于日常项目大多以规划版本进行迭代，所以这里将项目的前进以版本分支迭代的方式前进。并且规范化稳定版本前进的步骤，以达到部署确定版本代码、快速定位问题提交，减少合并代码冲突的目的。&lt;/p>
+&lt;h2 id="分支分类">分支分类&lt;/h2>
+&lt;ul>
+&lt;li>master 分支，为项目主分支，对应着稳定版本。&lt;/li>
+&lt;li>版本分支，为项目前进的动力，对应规划开发的版本。线上热修也以 patch 版本的迭代形式体现。&lt;/li>
+&lt;li>以环境命名的分支全部取消，环境应该可以随时部署某个版本的代码，和具体分支绑定非常不方便整体切换版本，所以后续应通过 CI 配置，将版本分支的不同阶段自动部署到对应环境。&lt;/li>
+&lt;/ul>
+&lt;h2 id="分支命名">分支命名&lt;/h2>
+&lt;ul>
+&lt;li>版本分支都以 &lt;code>feat&lt;/code> 为前缀并用 &lt;code>/&lt;/code> 分隔、后跟规划版本 &lt;code>v{major}.{minor}.{patch}&lt;/code> ，之后以 &lt;code>-&lt;/code> 连接版本阶段。目前只有 &lt;code>alpha&lt;/code> 为研发阶段，不带后缀为公开阶段。（例如：feat/v7.8.0-alpha）&lt;br>
+&lt;strong>研发阶段通过 CI 配置自动部署到 dev 环境，公开阶段部署到 test 环境&lt;/strong>&lt;/li>
+&lt;li>新功能都以 &lt;code>minor&lt;/code> 版本进行迭代。留下 &lt;code>patch&lt;/code> 版本作为热修的预留版本。&lt;/li>
+&lt;/ul>
+&lt;h2 id="生命周期">生命周期&lt;/h2>
+&lt;ol>
+&lt;li>当确定了研发版本后，由项目负责人建立对应的版本分支。&lt;/li>
+&lt;li>研发人员以分支此为基准开始迭代功能后，提交 pull request 请求合并进入版本分支。&lt;/li>
+&lt;li>功能都合并进入版本分支后修改分支名进入公开阶段，进行提测。&lt;/li>
+&lt;li>提测期间的提交，同样通过 pull request 请求合并进入版本分支。&lt;/li>
+&lt;li>测试完成后，将版本分支合并进入 master 分支。完成版本迭代。&lt;/li>
+&lt;/ol>
+&lt;ul>
+&lt;li>热修的版本分支可以跳过研发阶段，直接以步骤 3 的公开阶段命名，进入提测环节。&lt;/li>
+&lt;/ul>
+&lt;h2 id="库项目">库项目&lt;/h2>
+&lt;p>作为依赖库的项目，为了方便版本迭代，建议以线性的方式迭代，即不出现 merge commit 节点，合并都以 fast forward 的方式进行。保持版本的迭代清晰。&lt;/p></content></entry><entry><title type="text">React 中插入节点的方法</title><link rel="alternate" type="text/html" href="https://kuangshu.github.io/posts/react-append-dom-child/"/><id>https://kuangshu.github.io/posts/react-append-dom-child/</id><updated>2021-07-21T18:06:04+08:00</updated><published>2021-03-06T10:13:48+08:00</published><author><name>kuangshu</name><uri>https://kuangshu.github.io/</uri><email>252019869@qq.com</email></author><rights>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</rights><summary type="html">原生 dom 插入 JSX 可以通过 ref 设置函数&amp;lt;div ref={ref =&amp;gt; ref.appendChild(dom)}&amp;gt;&amp;lt;/div&amp;gt; string 插入 JSX 采用 react 的 api 来&amp;lt;div……</summary><content type="html">&lt;h3 id="原生-dom-插入-jsx">原生 dom 插入 JSX&lt;/h3>
+&lt;ol>
+&lt;li>可以通过 ref 设置函数&lt;code>&amp;lt;div ref={ref =&amp;gt; ref.appendChild(dom)}&amp;gt;&amp;lt;/div&amp;gt;&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;h3 id="string-插入-jsx">string 插入 JSX&lt;/h3>
+&lt;ol>
+&lt;li>采用 react 的 api 来&lt;code>&amp;lt;div dangerouslySetInnerHTML={__html: domStr}&amp;gt;&amp;lt;/div&amp;gt;&lt;/code>&lt;/li>
+&lt;li>使用原生的 api &lt;code>new DOMParser().parseFromString(domStr, 'text/html').body.childNodes;&lt;/code> 将 string 转化为 dom 节点再使用上面的方法插入 jsx 中&lt;/li>
+&lt;/ol></content></entry></feed>
