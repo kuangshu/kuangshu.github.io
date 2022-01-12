@@ -1,0 +1,705 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="zh-CN"><title type="text">瞌睡虫狂鼠</title><subtitle type="html">MemE 是一个强大且可高度定制的 GoHugo 博客主题，专为个人博客设计。</subtitle><updated>2022-01-12T22:33:01+08:00</updated><id>https://kuangshu.github.io/</id><link rel="alternate" type="text/html" href="https://kuangshu.github.io/"/><link rel="self" type="application/atom+xml" href="https://kuangshu.github.io/atom.xml"/><author><name>kuangshu</name><uri>https://kuangshu.github.io/</uri><email>252019869@qq.com</email></author><rights>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</rights><generator uri="https://gohugo.io/" version="0.91.2">Hugo</generator><entry><title type="text">UseReducer</title><link rel="alternate" type="text/html" href="https://kuangshu.github.io/posts/usereducer/"/><id>https://kuangshu.github.io/posts/usereducer/</id><updated>2022-01-12T22:33:00+08:00</updated><published>2022-01-06T22:46:58+08:00</published><author><name>kuangshu</name><uri>https://kuangshu.github.io/</uri><email>252019869@qq.com</email></author><rights>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</rights><summary type="html">什么时候用 useReducer 总结了之前几篇有关抽取 useEffect 内依赖的内容后，关于 何时将状态替换为 useReducer 有以下几点……</summary><content type="html">&lt;h2 id="什么时候用-usereducer">什么时候用 useReducer&lt;/h2>
+&lt;p>总结了之前几篇有关抽取 useEffect 内依赖的内容后，关于 何时将状态替换为 useReducer 有以下几点：&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>当更新依赖之前之前的状态时，也就是意味着当在 &lt;code>useEffect&lt;/code> 中写下 &lt;code>setState(prevState =&amp;gt; newState)&lt;/code> 的时候。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>当多个状态经常出现在同一个方法中的时候&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="kr">const&lt;/span> &lt;span class="nx">showModal&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">setStateA&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="nx">setStateB&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">state&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="p">};&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="nx">closeModal&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">setStateA&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="nx">setStateB&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">null&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="p">};&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>当一个状态更新需要依赖到另外的 state 或者 props 时&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="kd">function&lt;/span> &lt;span class="nx">Counter&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">count&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">setCount&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useState&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">step&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">setStep&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useState&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="nx">useEffect&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="nx">id&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">setInterval&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">setCount&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nx">c&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">c&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="nx">step&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="p">},&lt;/span> &lt;span class="mi">1000&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">clearInterval&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">id&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="p">},&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">step&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;span class="o">&amp;lt;&amp;gt;&lt;/span>
+&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="nx">h1&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">count&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="err">/h1&amp;gt;&lt;/span>
+&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="nx">input&lt;/span>
+&lt;span class="nx">value&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">step&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="nx">onChange&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{(&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">setStep&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">Number&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">target&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">value&lt;/span>&lt;span class="p">))}&lt;/span>
+&lt;span class="o">/&amp;gt;&lt;/span>
+&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="err">/&amp;gt;&lt;/span>
+&lt;span class="p">);&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="cm">/** 替换为 useReducer */&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">state&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">dispatch&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useReducer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">reducer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">initialState&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nx">count&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">step&lt;/span> &lt;span class="p">}&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">state&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="nx">useEffect&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="nx">id&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">setInterval&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">dispatch&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;tick&amp;#39;&lt;/span> &lt;span class="p">});&lt;/span> &lt;span class="c1">// Instead of setCount(c =&amp;gt; c + step);
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="p">},&lt;/span> &lt;span class="mi">1000&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">clearInterval&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">id&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="p">},&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">dispatch&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;span class="cm">/** 当依赖状态来自 props */&lt;/span>
+&lt;span class="kd">function&lt;/span> &lt;span class="nx">Counter&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">step&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">count&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">dispatch&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useReducer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">reducer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="kd">function&lt;/span> &lt;span class="nx">reducer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">state&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">action&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">action&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">type&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="s1">&amp;#39;tick&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">state&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="nx">step&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">throw&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nb">Error&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">useEffect&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="nx">id&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">setInterval&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">dispatch&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;tick&amp;#39;&lt;/span> &lt;span class="p">});&lt;/span>
+&lt;span class="p">},&lt;/span> &lt;span class="mi">1000&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">clearInterval&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">id&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="p">},&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">dispatch&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="nx">h1&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">count&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="err">/h1&amp;gt;;&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h2 id="关于-usereducer-的初始化">关于 useReducer 的初始化&lt;/h2>
+&lt;p>useReducer 有两种方式初始化&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>useReducer(reducer, initialState)&lt;/code> 当初始化状态独立存在的情况下可以使用这种方式来初始化状态&lt;/li>
+&lt;li>&lt;code>useReducer(reducer, initialArg, init)&lt;/code> 当初始化的状态需要通过 props 或其他 state 衍生获得时，就需要采用此种方式来初始化&lt;/li>
+&lt;/ol>
+&lt;p>除了常规情况外，还有一些情况下 useReducer 内的状态，依赖于 props 的变更做更新，那么必然需要副作用触发更新，而如果副作用中执行的更新与初始化状态中的值不太一致，那么必然会出现状态的抖动。那么此时可以将会引起抖动的状态，延迟到副作用更新时再初始化。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="kr">const&lt;/span> &lt;span class="nx">init&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">listA&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">listB&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="nx">todoList&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[...&lt;/span>&lt;span class="nx">listA&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">...&lt;/span>&lt;span class="nx">listB&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">todoList&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="c1">// doneList: todoList.filter((todo) =&amp;gt; todo.done),
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">doneList&lt;/span>: &lt;span class="kt">undefined&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="p">};&lt;/span>
+&lt;span class="p">};&lt;/span>
+&lt;span class="kd">function&lt;/span> &lt;span class="nx">useTodoList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">todoLists&lt;/span>: &lt;span class="kt">TodoList&lt;/span>&lt;span class="p">[])&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="nx">reducer&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useCallback&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;span class="p">(&lt;/span>&lt;span class="nx">state&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">action&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">action&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="s1">&amp;#39;UPDATE_FROM_PROPS&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="nx">todoList&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[...&lt;/span>&lt;span class="nx">listA&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">...&lt;/span>&lt;span class="nx">listB&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">todoList&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nx">doneList&lt;/span>: &lt;span class="kt">todoList.filter&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nx">todo&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="nx">todo&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">done&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;span class="p">};&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">state&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="p">},&lt;/span>
+&lt;span class="p">[&lt;/span>&lt;span class="nx">todoLists&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;span class="p">);&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">state&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">dispatch&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useReducer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">reducer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">todoLists&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">init&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="nx">useEffect&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">dispatch&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="s1">&amp;#39;UPDATE_FROM_PROPS&amp;#39;&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;span class="p">},&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">todoLists&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">state&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">dispatch&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>如上，如果在 init 中初始化了 doneList ，那么在触发 &lt;code>UPDATE_FROM_PROPS&lt;/code> 更新后 doneList 数组内的值虽然没有变化，但是引用会变为一个新数组，那么依赖于这个数据的 &lt;code>useEffect&lt;/code> 都会执行，相同的值触发的更新是我们不希望看到的，这时就可以在 useEffect 的 dispatch 处理函数中一并初始化，保持 &lt;code>useEffect&lt;/code> 内的操作始终如一。&lt;/p></content></entry><entry><title type="text">Tips About UseEffect 3</title><link rel="alternate" type="text/html" href="https://kuangshu.github.io/posts/tips-about-useeffect3/"/><id>https://kuangshu.github.io/posts/tips-about-useeffect3/</id><updated>2022-01-12T22:33:00+08:00</updated><published>2021-12-24T22:58:14+08:00</published><author><name>kuangshu</name><uri>https://kuangshu.github.io/</uri><email>252019869@qq.com</email></author><rights>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</rights><summary type="html">关于 useEffect 的小 tips 3 当我切换到数据流思考之后，我发现了之前一直被忽略的一个东西————函数……</summary><content type="html">&lt;h1 id="关于-useeffect-的小-tips-3">关于 useEffect 的小 tips 3&lt;/h1>
+&lt;p>当我切换到数据流思考之后，我发现了之前一直被忽略的一个东西————函数。可能是受到 &lt;code>class component&lt;/code> 的影响，对于&lt;code>props&lt;/code>传入的进来的对象，任何时候我都明确知道其的可变性。而对于函数确很少关注其状态的变化。并且&lt;code>class&lt;/code>的函数方法总能通过让人又爱又恨的&lt;code>this&lt;/code>拿到最新的状态，这样的印象在使用&lt;code>hooks&lt;/code>的函数式组件中经常会误导我写出错误的代码。而 react 的官方文档中又使用 &lt;code>useEffect&lt;/code> 来类比 &lt;code>componentDidMount&lt;/code> 、 &lt;code>componentDidUpdate&lt;/code> 和 &lt;code>componentWillUnmount&lt;/code> ，更是加深了我的错误印象，他们只是效果类似，实际使用完全不同。&lt;/p>
+&lt;h2 id="函数的可变意味着什么">函数的可变意味着什么？&lt;/h2>
+&lt;p>在 Dan 的博客中有下面这样的案例：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="kd">function&lt;/span> &lt;span class="nx">SearchResults&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">query&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">setQuery&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useState&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="c1">// ✅ Preserves identity until query changes
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">getFetchUrl&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useCallback&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="s1">&amp;#39;https://hn.algolia.com/api/v1/search?query=&amp;#39;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="nx">query&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="p">},&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">query&lt;/span>&lt;span class="p">]);&lt;/span> &lt;span class="c1">// ✅ Callback deps are OK
+&lt;/span>&lt;span class="c1">&lt;/span>
+&lt;span class="nx">useEffect&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="nx">url&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">getFetchUrl&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="c1">// ... Fetch data and do something ...
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="p">},&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">getFetchUrl&lt;/span>&lt;span class="p">]);&lt;/span> &lt;span class="c1">// ✅ Effect deps are OK
+&lt;/span>&lt;span class="c1">&lt;/span>
+&lt;span class="c1">// ...
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>其中 &lt;code>getFetchUrl&lt;/code> 其实代表的是 &lt;code>query&lt;/code> 这个 state，这样看使用 &lt;code>useCallback&lt;/code> 包裹的函数完全可以参与到数据流中。这个函数的变更就代表了 query 的变更。这个和对于&lt;code>class&lt;/code>组件方法的认知完全不同，&lt;code>class&lt;/code>的时代需要传入其他的 props 来确定要不要调用在这个方法，因为方法本身无法传递其背后依赖的状态的变化。如下例：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="kr">class&lt;/span> &lt;span class="nx">Parent&lt;/span> &lt;span class="kr">extends&lt;/span> &lt;span class="nx">Component&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">state&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">query&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="p">};&lt;/span>
+&lt;span class="nx">fetchData&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="nx">url&lt;/span> &lt;span class="o">=&lt;/span>
+&lt;span class="s1">&amp;#39;https://hn.algolia.com/api/v1/search?query=&amp;#39;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">state&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">query&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="c1">// ... Fetch data and do something ...
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="p">};&lt;/span>
+&lt;span class="nx">render&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="nx">Child&lt;/span> &lt;span class="nx">fetchData&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">fetchData&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="nx">query&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">state&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">query&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">/&amp;gt;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="kr">class&lt;/span> &lt;span class="nx">Child&lt;/span> &lt;span class="kr">extends&lt;/span> &lt;span class="nx">Component&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">state&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">data&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="kc">null&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="p">};&lt;/span>
+&lt;span class="nx">componentDidMount&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">fetchData&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">componentDidUpdate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">prevProps&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">query&lt;/span> &lt;span class="o">!==&lt;/span> &lt;span class="nx">prevProps&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">query&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">this&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">fetchData&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">render&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="c1">// ...
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="cm">/** == Hooks == */&lt;/span>
+&lt;span class="kd">function&lt;/span> &lt;span class="nx">Parent&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">query&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">setQuery&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useState&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;react&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="c1">// ✅ Preserves identity until query changes
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">fetchData&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useCallback&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="nx">url&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;https://hn.algolia.com/api/v1/search?query=&amp;#39;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="nx">query&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="c1">// ... Fetch data and return it ...
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="p">},&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">query&lt;/span>&lt;span class="p">]);&lt;/span> &lt;span class="c1">// ✅ Callback deps are OK
+&lt;/span>&lt;span class="c1">&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="nx">Child&lt;/span> &lt;span class="nx">fetchData&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">fetchData&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="o">/&amp;gt;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="kd">function&lt;/span> &lt;span class="nx">Child&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">fetchData&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kd">let&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">data&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">setData&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useState&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">null&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="nx">useEffect&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">fetchData&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="nx">then&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">setData&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="p">},&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">fetchData&lt;/span>&lt;span class="p">]);&lt;/span> &lt;span class="c1">// ✅ Effect deps are OK
+&lt;/span>&lt;span class="c1">&lt;/span>
+&lt;span class="c1">// ...
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="关注范围扩大的心智负担">关注范围扩大的心智负担&lt;/h2>
+&lt;p>在认识到了函数的变化代表了状态的变化之后，其实又引入了新的问题，就是关注范围的扩大。上例中仅仅是父子组件，还能很清晰的知道当前函数背后代表的 state ，当传递的链路变长、方法变多之后，在决定将哪些函数放入&lt;code>useEffect&lt;/code>依赖的思考就很让人难以接受了。这里 react 给出了一个方案来&lt;a href="https://reactjs.org/docs/hooks-faq.html#how-to-avoid-passing-callbacks-down">避免传递回调函数&lt;/a>:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-jsx" data-lang="jsx">&lt;span class="kr">const&lt;/span> &lt;span class="nx">TodosDispatch&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">React&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">createContext&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">null&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="kd">function&lt;/span> &lt;span class="nx">TodosApp&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="c1">// Note: `dispatch` won&amp;#39;t change between re-renders
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">todos&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">dispatch&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useReducer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">todosReducer&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>
+&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">TodosDispatch.Provider&lt;/span> &lt;span class="na">value&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">dispatch&lt;/span>&lt;span class="p">}&amp;gt;&lt;/span>
+&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">DeepTree&lt;/span> &lt;span class="na">todos&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">todos&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">TodosDispatch.Provider&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;span class="p">);&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="c1">// 顺便说一句需要 `todos` 状态要另外用一个 context ，保证 dispatch 的 context 永远不会更新。
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这确实是一个减轻心智负担的方法。不过对于已经选择了传递回调的组件来说，我个人的思路是不关注函数背后的状态，只关心函数的可变性对组件内部副作用的影响。&lt;/p>
+&lt;p>以之前例子 &lt;code>useEffect&lt;/code> 中的 &lt;code>fetchData&lt;/code>举例，子组件这个副作用是依赖了这个请求方法来 &lt;code>setData&lt;/code>，如果换一个目的，子组件是只需要执行一次 &lt;code>setData&lt;/code>，那么子组件应当移除 &lt;code>useEffect&lt;/code> 依赖的 &lt;code>fetchData&lt;/code> ，以 ref 或者其他方式来调用。在子组件正确的处理了自己的逻辑之后，父组件发现子组件工作的方式不正确，就应当注意自己的调用方式是否正确，或者使用了错误的子组件。&lt;/p>
+&lt;h2 id="useeffect-中的异步函数">useEffect 中的异步函数&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="nx">useEffect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kr">async&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">await&lt;/span> &lt;span class="nx">fetchData&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="c1">// ...
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="p">},&lt;/span> &lt;span class="p">[]);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>在 &lt;code>useEffect&lt;/code> 中传入异步函数是一个错误行为，async 函数调用后会返回一个 &lt;code>Promise&lt;/code> ， 而 &lt;code>useEffect&lt;/code> 需要的是一个清理函数，react 并不会等待异步的结果，而且在异步函数中返回的同步清理函数也会失效。正确的做法是：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="nx">useEffect&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">async&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="nx">fetchHandler&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">await&lt;/span> &lt;span class="nx">fetchData&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="nx">fetchHandler&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="c1">// ...
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="p">},&lt;/span> &lt;span class="p">[]);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="useeffect-的误用场景">useEffect 的误用场景&lt;/h2>
+&lt;p>回想之前自己写的代码，感觉有很多时候是没有把握好 useEffect 的使用场景，才导致的 useEffect 比较难用。&lt;/p>
+&lt;ol>
+&lt;li>模仿 class 的生命周期
+这点在 tips2 中提过，如果你试图写一个 effect 会根据是否第一次渲染而表现不一致，你正在逆潮而动。这种场景大部分可以把 useEffect 的逻辑融入到 useState 或者 useReducer 的 initializer 中&lt;/li>
+&lt;li>对依赖状态的 watcher
+很多时候使用 useEffect 是为了依赖某个状态去更新本地的多个状态。这种场景完全应该使用 useReducer 的 dispatch 替换，只要 useEffect 内是同步的纯计算方法都可以如此替换，哪怕 effect 内调用的是较高层级传下来的回调方法，也应该尝试替换为在上层传下 dispatch 来调用。&lt;/li>
+&lt;/ol>
+&lt;p>以上两点如果做到了之后，useEffect 几乎回到了其本职的工作，即副作用的执行，比如异步请求，操作 bom / dom，计时器等。&lt;/p></content></entry><entry><title type="text">Tips About UseEffect 2</title><link rel="alternate" type="text/html" href="https://kuangshu.github.io/posts/tips-about-useeffect2/"/><id>https://kuangshu.github.io/posts/tips-about-useeffect2/</id><updated>2022-01-12T22:33:00+08:00</updated><published>2021-12-23T21:57:29+08:00</published><author><name>kuangshu</name><uri>https://kuangshu.github.io/</uri><email>252019869@qq.com</email></author><rights>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</rights><summary type="html">关于 useEffect 的小 tips 2 上篇文章从 react 的官网得到了几个结论之后，继续看了 Dan 的博客文章，其中详细的……</summary><content type="html">&lt;h1 id="关于-useeffect-的小-tips-2">关于 useEffect 的小 tips 2&lt;/h1>
+&lt;p>上篇文章从 react 的官网得到了几个结论之后，继续看了 Dan 的&lt;a href="https://overreacted.io/zh-hans/a-complete-guide-to-useeffect/">博客文章&lt;/a>，其中详细的说明了上篇文章的中如此处理的内在逻辑。主要就是要以数据流和同步的方式去思考组件内的&lt;code>props&lt;/code>和&lt;code>state&lt;/code>以及&lt;code>useEffect&lt;/code>的运作方式。之所以日常我们自己写 useEffect 经常变得混乱的原因主要就是这两条：&lt;/p>
+&lt;ol>
+&lt;li>没有把组件内发生了什么(actions)和状态如何响应并更新分开表述。&lt;/li>
+&lt;li>想要从过去渲染中的函数里读取未来的 props 和 state&lt;/li>
+&lt;/ol>
+&lt;p>关于触发和响应更新没有分开，最常见的就是我们在 useEffect 中要更新某个状态，还在依赖项中依赖这个状态或其相关的衍生状态，这就会导致无限更新。而另一个常见的场景是为什么函数执行拿到的 &lt;code>state&lt;/code> 或者 &lt;code>props&lt;/code> 是旧的值，这就涉及到一个同步思考的问题。每次渲染可以看作独立的一帧，每一帧之间互相独立。于是得到结论就是：&lt;/p>
+&lt;blockquote>
+&lt;p>组件内的每一个函数（包括事件处理函数，effects，定时器或者 API 调用等等）会捕获定义它们的那次渲染中的 props 和 state。&lt;/p>
+&lt;/blockquote>
+&lt;blockquote>
+&lt;p>如果你试图写一个 effect 会根据是否第一次渲染而表现不一致，你正在逆潮而动。&lt;/p>
+&lt;/blockquote>
+&lt;p>以同步的方式替换掉生命周期的印象，才能写出更好的代码。&lt;/p>
+&lt;h2 id="如何正确处理-useeffect-依赖">如何正确处理 useEffect 依赖&lt;/h2>
+&lt;p>首先要做到的是诚实告知依赖，有两种诚实告知依赖的策略。&lt;/p>
+&lt;ol>
+&lt;li>在依赖中包含所有 effect 中用到的组件内的值。&lt;/li>
+&lt;li>修改 effect 内部的代码以确保它包含的值只会在需要的时候发生变更。我们不想告知错误的依赖 - 我们只是修改 effect 使得依赖更少。&lt;/li>
+&lt;/ol>
+&lt;p>目前很多时候我只做到了第一点，这让副作用的执行时机难以捉摸，而这时候第二点就很重要了。对于依赖中的 props state 可以分情况考虑。&lt;/p>
+&lt;p>如果 effect 的目的是更新 state 那么可以采用函数式更新来避免依赖此状态。如果更新还涉及其他状态共同参与则考虑使用 useReducer 来彻底的将更新状态的逻辑与触发行为处理分离开。甚至用到的依赖是从 props 传入的也可以处理。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="kd">function&lt;/span> &lt;span class="nx">Counter&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">step&lt;/span> &lt;span class="p">})&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">count&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">dispatch&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useReducer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">reducer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="kd">function&lt;/span> &lt;span class="nx">reducer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">state&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">action&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">action&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">type&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="s1">&amp;#39;tick&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">state&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="nx">step&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">throw&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nb">Error&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="c1">// useEffect(() =&amp;gt; {
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// const id = setInterval(() =&amp;gt; {
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// setCount(count + step);
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// }, 1000);
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// return () =&amp;gt; clearInterval(id);
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// }, [count, step]);
+&lt;/span>&lt;span class="c1">&lt;/span>
+&lt;span class="c1">// useEffect(() =&amp;gt; {
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// const id = setInterval(() =&amp;gt; {
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// setCount((c) =&amp;gt; c + step);
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// }, 1000);
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// return () =&amp;gt; clearInterval(id);
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// }, [step]);
+&lt;/span>&lt;span class="c1">&lt;/span>
+&lt;span class="nx">useEffect&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="nx">id&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">setInterval&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">dispatch&lt;/span>&lt;span class="p">({&lt;/span> &lt;span class="nx">type&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="s1">&amp;#39;tick&amp;#39;&lt;/span> &lt;span class="p">});&lt;/span>
+&lt;span class="p">},&lt;/span> &lt;span class="mi">1000&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="nx">clearInterval&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">id&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="p">},&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">dispatch&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="nx">h1&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="nx">count&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="err">/h1&amp;gt;;&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>可以看到将 reducer 声明在组件内，就可以调用任何 props 传入的值，比较上面注释的代码 useReducer 可以将更新逻辑放入 reducer 中，保证了 useEffect 能将真正需要触发的状态加入依赖，而不是将一大堆的状态也都收集进来。
+关于这个 useReducer 还要补充点：&lt;/p>
+&lt;ol>
+&lt;li>当你写类似&lt;code>setSomething(something =&amp;gt; ...)&lt;/code>这种代码的时候，也许就是考虑使用 reducer 的契机。&lt;/li>
+&lt;li>按照上面同步的思考，当 step 更新后 dispatch 触发的时候，当前帧的 reducer 收集的 props 应该是上一次的，但实际更新结果并不是，那是因为当你 dispatch 的时候，React 只是记住了 action - 它会在下一次渲染中再次调用 reducer。在那个时候，新的 props 就可以被访问到，而且 reducer 调用也不是在 effect 里。&lt;/li>
+&lt;/ol></content></entry><entry><title type="text">Tips About UseEffect</title><link rel="alternate" type="text/html" href="https://kuangshu.github.io/posts/tips-about-useeffect/"/><id>https://kuangshu.github.io/posts/tips-about-useeffect/</id><updated>2022-01-12T22:33:00+08:00</updated><published>2021-12-21T23:26:28+08:00</published><author><name>kuangshu</name><uri>https://kuangshu.github.io/</uri><email>252019869@qq.com</email></author><rights>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</rights><summary type="html">关于 useEffect 的小 tips 今天重新读了 react 的官网，发现对于 useEffect 还是有很多误用的地方。主要是对于其依赖项……</summary><content type="html">&lt;h1 id="关于-useeffect-的小-tips">关于 useEffect 的小 tips&lt;/h1>
+&lt;p>今天重新读了 react 的官网，发现对于 useEffect 还是有很多误用的地方。主要是对于其依赖项的管理小问题。&lt;/p>
+&lt;h2 id="在-useeffect-内部声明函数">在 useEffect 内部声明函数&lt;/h2>
+&lt;ul>
+&lt;li>对于是否在依赖数组中添加函数，官方的建议是只在当前 useEffect 内使用的函数可以提到内部声明，方便将此方法用到的 props 或 state 加入依赖数组。&lt;/li>
+&lt;li>将函数移到组件外声明，该函数保证不引用任何 props 或 state，也不需要在依赖项列表中。&lt;/li>
+&lt;li>如果您调用的函数是纯计算并且在渲染时调用是安全的，您可以改为在效果之外调用它，并使效果依赖于返回值。
+&lt;ul>
+&lt;li>关于这点，如果是纯函数，那么每次渲染调用的参数一致则结果一致。所以 useEffect 只收集此函数的返回结果也是稳定的&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>最后，才是定义一个用 useCallback Hook 包裹的函数，确保它不会在每次渲染时发生变化，除非它自己的依赖项也发生变化。&lt;/li>
+&lt;/ul>
+&lt;h2 id="useeffect-的依赖更新太频繁">useEffect 的依赖更新太频繁&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>如果需要爱 useEffect 中更新 state 并且依赖于 state 的值可以使用 Functional updates 即 &lt;code>setState(prevState =&amp;gt; newState)&lt;/code>来更新 state。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>在更复杂的情况下（例如，如果一个状态依赖于另一个状态），请尝试使用 useReducerHook 将状态更新逻辑移到效果之外。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>最后的手段是 useRef 来保存可变变量，这里官方的案例中代码值得注意&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="kd">function&lt;/span> &lt;span class="nx">Example&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="c1">// Keep latest props in a ref.
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="kr">const&lt;/span> &lt;span class="nx">latestProps&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useRef&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="nx">useEffect&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">latestProps&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">current&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">props&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="p">});&lt;/span>
+&lt;span class="nx">useEffect&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kd">function&lt;/span> &lt;span class="nx">tick() {&lt;/span>
+&lt;span class="c1">// Read latest props at any time
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="nx">console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">latestProps&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">current&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="nx">id&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">setInterval&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">tick&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1000&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="p">()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="nx">clearInterval&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">id&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="p">},&lt;/span> &lt;span class="p">[]);&lt;/span> &lt;span class="c1">// This effect never re-runs
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这里对于 ref 的赋值操作还是在一个 useEffect 中来处理的而不是函数体内直接赋值的。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="关于初始化昂贵对象的操作">关于初始化昂贵对象的操作&lt;/h2>
+&lt;p>这里解答了部分我上个文章里面的疑惑，react 官方文档在 &lt;a href="https://reactjs.org/docs/hooks-reference.html#lazy-initial-state">useState#lazy-initial-state&lt;/a>中明确此函数只在初始渲染时被调用。 &lt;a href="https://reactjs.org/docs/hooks-reference.html#usememo">useMemo&lt;/a> 的章节中，其中有一段&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>你可以把 useMemo 作为性能优化的手段，但不要把它当成语义上的保证。&lt;/strong> 将来，React 可能会选择“遗忘”以前的一些 memoized 值，并在下次渲染时重新计算它们。&lt;/p>
+&lt;/blockquote>
+&lt;p>所以用依赖空数组 useMemo 去&lt;code>new Class()&lt;/code>并不能像&lt;code>useState&lt;/code>那样稳定地创建不可变的本地状态。&lt;/p>
+&lt;p>另一个问题是 useRef 的初始化，这里提供了一个延迟创建及取值的范例&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="kd">function&lt;/span> &lt;span class="nx">Image&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">props&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="kr">const&lt;/span> &lt;span class="nx">ref&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useRef&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">null&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="c1">// ✅ IntersectionObserver is created lazily once
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="kd">function&lt;/span> &lt;span class="nx">getObserver&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">ref&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">current&lt;/span> &lt;span class="o">===&lt;/span> &lt;span class="kc">null&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nx">ref&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">current&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">IntersectionObserver&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">onIntersect&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="k">return&lt;/span> &lt;span class="nx">ref&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">current&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="c1">// When you need it, call getObserver()
+&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// ...
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></content></entry><entry><title type="text">useState vs useMemo</title><link rel="alternate" type="text/html" href="https://kuangshu.github.io/posts/usestate-vs-usememo/"/><id>https://kuangshu.github.io/posts/usestate-vs-usememo/</id><updated>2022-01-12T22:33:00+08:00</updated><published>2021-12-20T23:46:58+08:00</published><author><name>kuangshu</name><uri>https://kuangshu.github.io/</uri><email>252019869@qq.com</email></author><rights>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</rights><summary type="html">关于 Hooks 中初始化类 今天看到了一段代码，主要是在 hooks 中使用了一个 useMemo 方法，生成了一个类的实例……</summary><content type="html">&lt;h1 id="关于-hooks-中初始化类">关于 Hooks 中初始化类&lt;/h1>
+&lt;p>今天看到了一段代码，主要是在 hooks 中使用了一个 &lt;code>useMemo&lt;/code> 方法，生成了一个类的实例，代码如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="c1">// in hooks
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">helper&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useMemo&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">Helper&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">options&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="p">[]);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>本意就是只生成一次这个类，方便在之后的代码中使用。不过我觉得应该使用 &lt;code>useState&lt;/code>来初始化这个类，而不是缓存方法，代码如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-ts" data-lang="ts">&lt;span class="c1">// in hooks
+&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="nx">helper&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">useState&lt;/span>&lt;span class="p">(()&lt;/span> &lt;span class="o">=&amp;gt;&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">Helper&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">options&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>之所以这么处理的原因有：&lt;/p>
+&lt;ol>
+&lt;li>这个类并不依赖于此 hook 内的上下文做变化，而是需要一个初始化的场景。和使用&lt;code>useMemo&lt;/code>的语义不合。&lt;/li>
+&lt;li>这里&lt;code>useMemo&lt;/code>有使用上下文的&lt;code>options&lt;/code>，但是并不将其放入依赖，会让查看代码的人产生误会。&lt;/li>
+&lt;li>&lt;code>useMemo&lt;/code>中应是一个纯函数方法，&lt;code>new Class()&lt;/code>带有明显副作用。不应当使用&lt;code>useMemo&lt;/code>来创建一个类。&lt;/li>
+&lt;/ol>
+&lt;p>我个人将&lt;code>useMemo&lt;/code>更多的看作是一个&lt;code>computed&lt;/code>的值来看待。而当前场景明显是一个&lt;code>initialize&lt;/code>的操作，感觉应该是一个&lt;code>useMemo&lt;/code>很容易被误用的场景。虽然我是这么认为的，不过团队中的小伙伴并不这么认为，小伙伴的意见是，这里就是为了缓存这个变量，使用&lt;code>useMemo&lt;/code>没有问题，所以这个问题也就被搁置了。如果按着这个思路考虑，&lt;code>new&lt;/code>的行为算是初始化，&lt;code>new&lt;/code>出的结果需要缓存，好像用&lt;code>useMemo&lt;/code>也说得通。有感而发，只有待以后遇到更多这样的场景，再来考虑使用规范了。&lt;/p></content></entry><entry><title type="text">项目Git分支管理</title><link rel="alternate" type="text/html" href="https://kuangshu.github.io/posts/git-branch/"/><id>https://kuangshu.github.io/posts/git-branch/</id><updated>2022-01-12T22:33:00+08:00</updated><published>2021-05-02T11:02:20+08:00</published><author><name>kuangshu</name><uri>https://kuangshu.github.io/</uri><email>252019869@qq.com</email></author><rights>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</rights><summary type="html">前言 日常迭代的项目中，由于有多人开发所以分支及合并经常会非常混乱，如果不加以规范和约……</summary><content type="html">&lt;h2 id="前言">前言&lt;/h2>
+&lt;p>日常迭代的项目中，由于有多人开发所以分支及合并经常会非常混乱，如果不加以规范和约束，那么长久迭代之后肯定会非常混乱。由于日常项目大多以规划版本进行迭代，所以这里将项目的前进以版本分支迭代的方式前进。并且规范化稳定版本前进的步骤，以达到部署确定版本代码、快速定位问题提交，减少合并代码冲突的目的。&lt;/p>
+&lt;h2 id="分支分类">分支分类&lt;/h2>
+&lt;ul>
+&lt;li>master 分支，为项目主分支，对应着稳定版本。&lt;/li>
+&lt;li>版本分支，为项目前进的动力，对应规划开发的版本。线上热修也以 patch 版本的迭代形式体现。&lt;/li>
+&lt;li>以环境命名的分支全部取消，环境应该可以随时部署某个版本的代码，和具体分支绑定非常不方便整体切换版本，所以后续应通过 CI 配置，将版本分支的不同阶段自动部署到对应环境。&lt;/li>
+&lt;/ul>
+&lt;h2 id="分支命名">分支命名&lt;/h2>
+&lt;ul>
+&lt;li>版本分支都以 &lt;code>feat&lt;/code> 为前缀并用 &lt;code>/&lt;/code> 分隔、后跟规划版本 &lt;code>v{major}.{minor}.{patch}&lt;/code> ，之后以 &lt;code>-&lt;/code> 连接版本阶段。目前只有 &lt;code>alpha&lt;/code> 为研发阶段，不带后缀为公开阶段。（例如：feat/v7.8.0-alpha）&lt;br>
+&lt;strong>研发阶段通过 CI 配置自动部署到 dev 环境，公开阶段部署到 test 环境&lt;/strong>&lt;/li>
+&lt;li>新功能都以 &lt;code>minor&lt;/code> 版本进行迭代。留下 &lt;code>patch&lt;/code> 版本作为热修的预留版本。&lt;/li>
+&lt;/ul>
+&lt;h2 id="生命周期">生命周期&lt;/h2>
+&lt;ol>
+&lt;li>当确定了研发版本后，由项目负责人建立对应的版本分支。&lt;/li>
+&lt;li>研发人员以分支此为基准开始迭代功能后，提交 pull request 请求合并进入版本分支。&lt;/li>
+&lt;li>功能都合并进入版本分支后修改分支名进入公开阶段，进行提测。&lt;/li>
+&lt;li>提测期间的提交，同样通过 pull request 请求合并进入版本分支。&lt;/li>
+&lt;li>测试完成后，将版本分支合并进入 master 分支。完成版本迭代。&lt;/li>
+&lt;/ol>
+&lt;ul>
+&lt;li>热修的版本分支可以跳过研发阶段，直接以步骤 3 的公开阶段命名，进入提测环节。&lt;/li>
+&lt;/ul>
+&lt;h2 id="库项目">库项目&lt;/h2>
+&lt;p>作为依赖库的项目，为了方便版本迭代，建议以线性的方式迭代，即不出现 merge commit 节点，合并都以 fast forward 的方式进行。保持版本的迭代清晰。&lt;/p></content></entry><entry><title type="text">React 中插入节点的方法</title><link rel="alternate" type="text/html" href="https://kuangshu.github.io/posts/react-append-dom-child/"/><id>https://kuangshu.github.io/posts/react-append-dom-child/</id><updated>2022-01-12T22:33:00+08:00</updated><published>2021-03-06T10:13:48+08:00</published><author><name>kuangshu</name><uri>https://kuangshu.github.io/</uri><email>252019869@qq.com</email></author><rights>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</rights><summary type="html">原生 dom 插入 JSX 可以通过 ref 设置函数&amp;lt;div ref={ref =&amp;gt; ref.appendChild(dom)}&amp;gt;&amp;lt;/div&amp;gt; string 插入 JSX 采用 react 的 api 来&amp;lt;div……</summary><content type="html">&lt;h3 id="原生-dom-插入-jsx">原生 dom 插入 JSX&lt;/h3>
+&lt;ol>
+&lt;li>可以通过 ref 设置函数&lt;code>&amp;lt;div ref={ref =&amp;gt; ref.appendChild(dom)}&amp;gt;&amp;lt;/div&amp;gt;&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;h3 id="string-插入-jsx">string 插入 JSX&lt;/h3>
+&lt;ol>
+&lt;li>采用 react 的 api 来&lt;code>&amp;lt;div dangerouslySetInnerHTML={__html: domStr}&amp;gt;&amp;lt;/div&amp;gt;&lt;/code>&lt;/li>
+&lt;li>使用原生的 api &lt;code>new DOMParser().parseFromString(domStr, 'text/html').body.childNodes;&lt;/code> 将 string 转化为 dom 节点再使用上面的方法插入 jsx 中&lt;/li>
+&lt;/ol></content></entry></feed>
